@@ -45,7 +45,15 @@
         <section class="sign-in-page" >
            
           <div class="container p-0" id="sign-in-page-box">
-                <div class="bg-white form-container ">
+                <div class="sign-in-page-data" v-if="default_error">
+                    <div class="alert text-white bg-secondary" role="alert">
+                        <div class="iq-alert-icon">
+                            <i class="ri-information-line"></i>
+                        </div>
+                        <div class="iq-alert-text">This url is without reference, please confirm that the link is correct, or contact us: +234 704224 5050</div>
+                    </div>
+                </div>
+                <div class="bg-white form-container " v-else>
                     <div class="sign-in-page-data">
                       <div class="sign-in-from w-100 m-auto" >
                         <a @click="$router.go(-1)"><i class="fa fa-long-arrow-left" fs-25 aria-hidden="true" style="font-size:25px"></i> </a>
@@ -73,7 +81,7 @@
                                 </div>
                           </form>
                       </div>
-                  </div>
+                    </div>
                 </div>
 
             </div>
@@ -93,7 +101,8 @@ import 'vue-phone-number-input/dist/vue-phone-number-input.css';
             country : "",
             phone_number : "",
             loading : false,
-            errors : []
+            errors : [],
+            default_error : false
             }
         },
         methods: {
@@ -122,6 +131,15 @@ import 'vue-phone-number-input/dist/vue-phone-number-input.css';
             },
             clearErrors(){
                 this.errors.splice(0);
+            }
+        },
+        mounted(){
+            let reference = localStorage.getItem('reference')
+            if(reference){
+                // console.log("This is with reference");
+            } else{
+                this.default_error = true
+                console.log("This is without reference");
             }
         }
      })

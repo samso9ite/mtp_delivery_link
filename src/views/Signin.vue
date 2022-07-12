@@ -3,7 +3,15 @@
            
           <div class="container p-0" id="sign-in-page-box">
                 <div class="bg-white form-container ">
-                    <div class="sign-in-page-data">
+                   <div class="sign-in-page-data" v-if="default_error">
+                        <div class="alert text-white bg-secondary" role="alert">
+                            <div class="iq-alert-icon">
+                                <i class="ri-information-line"></i>
+                            </div>
+                            <div class="iq-alert-text">This url is without reference, please confirm that the link is correct, or contact us: +234 704224 5050</div>
+                        </div>
+                   </div>
+                   <div class="sign-in-page-data" v-else>
                       <div class="sign-in-from w-100 m-auto" >
                         <a @click="$router.go(-1)"><i class="fa fa-long-arrow-left" fs-25 aria-hidden="true" style="font-size:25px"></i> </a>
                           <h3 class="mb-3 text-center">Sign in</h3>
@@ -36,7 +44,7 @@
                                 </div>
                           </form>
                       </div>
-                  </div>
+                    </div>
                 </div>
 
             </div>
@@ -57,7 +65,8 @@ import 'vue-phone-number-input/dist/vue-phone-number-input.css';
             phone_number : "",
             password: '',
             loading : false,
-            errors : []
+            errors : [],
+            default_error : false
             }
         },
         components:{VuePhoneNumberInput, VuePassword},
@@ -67,28 +76,42 @@ import 'vue-phone-number-input/dist/vue-phone-number-input.css';
                 this.errors.splice(0);
             },
             submitForm(){
-                this.clearErrors()
-                this.loading = true 
-                let phoneData = this.$refs.phone_number.phoneFormatted.replace(/\s/g, "");
-                let user_reference = localStorage.getItem('reference')
-                const formData = {password: this.password, phone: phoneData, reference:user_reference }
-                Api.axios_instance.post(Api.baseUrl+'/delivery_link/user/login', formData)
-                .then(response => {
-                    localStorage.setItem('token', response.data.token)
-                    this.$store.commit('store_wallet_balance', {wallet_balance:response.data.user_details.wallet_balance})
-                    this.$router.push('/set-destination')
-                })
-                .catch( error => {
-                    for(const property in error.response.data){
-                        this.errors.push(`${error.response.data[property]}`)
-                    }
-                })
-                .finally( () =>
-                    {this.loading = false}
-                )
+                if(localStorage.getItem('reference') == ""){
+                    this.default_error = true
+                }
+                else{
+                    this.clearErrors()
+                    this.loading = true 
+                    let phoneData = this.$refs.phone_number.phoneFormatted.replace(/\s/g, "");
+                    let user_reference = localStorage.getItem('reference')
+                    const formData = {password: this.password, phone: phoneData, reference:user_reference }
+                    Api.axios_instance.post(Api.baseUrl+'/delivery_link/user/login', formData)
+                    .then(response => {
+                        localStorage.setItem('token', response.data.token)
+                        this.$store.commit('store_wallet_balance', {wallet_balance:response.data.user_details.wallet_balance})
+                        this.$router.push('/set-destination')
+                    })
+                    .catch( error => {
+                        for(const property in error.response.data){
+                            this.errors.push(`${error.response.data[property]}`)
+                        }
+                    })
+                    .finally( () =>
+                        {this.loading = false}
+                    )
+                }
             }
-           
-        }
+            
+        },
+        mounted(){
+                let reference = localStorage.getItem('reference')
+                if(reference){
+                    // console.log("This is with reference");
+                } else{
+                    this.default_error = true
+                    console.log("This is without reference");
+                }
+            }
     })
 </script>
   

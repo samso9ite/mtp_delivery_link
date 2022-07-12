@@ -61,13 +61,18 @@ const routes = [
     name: 'Register',
     component: () => import('../views/Register.vue')
   },
-   {
+  {
     path: '/paystack/:paystack_url',
     name: 'Paystack',
     component: () => import('../views/PaymentPage.vue'),
     props:true,
     // meta: { requiresAuth: true }
   },
+  {
+    path: '*', 
+    component: () => import('../views/Page404.vue'),
+    name: '404'
+  }
 ]
 
 const router = new VueRouter({
